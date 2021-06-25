@@ -2288,10 +2288,13 @@ input_handle_capabilities(void *data, struct wl_seat *seat,
 	}
 
 	if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !input->parent.keyboard) {
-		input->parent.keyboard = wl_seat_get_keyboard(seat);
-		wl_keyboard_set_user_data(input->parent.keyboard, input);
-		wl_keyboard_add_listener(input->parent.keyboard,
-					 &keyboard_listener, input);
+		const char *disable = getenv("WESTON_DISABLE_KEYBOARD");
+		if (!disable) {
+			input->parent.keyboard = wl_seat_get_keyboard(seat);
+			wl_keyboard_set_user_data(input->parent.keyboard, input);
+			wl_keyboard_add_listener(input->parent.keyboard,
+						 &keyboard_listener, input);
+		}
 	} else if (!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && input->parent.keyboard) {
 		if (input->seat_version >= WL_KEYBOARD_RELEASE_SINCE_VERSION)
 			wl_keyboard_release(input->parent.keyboard);
@@ -2563,7 +2566,9 @@ registry_handle_global(void *data, struct wl_registry *registry, uint32_t name,
 			wl_registry_bind(registry, name,
 					 &zwp_fullscreen_shell_v1_interface, 1);
 	} else if (strcmp(interface, "wl_seat") == 0) {
-		display_add_seat(b, name, version);
+		const char *disable = getenv("WESTON_DISABLE_SEAT");
+		if (!disable)
+			display_add_seat(b, name, version);
 	} else if (strcmp(interface, "wl_output") == 0) {
 		wayland_backend_register_output(b, name);
 	} else if (strcmp(interface, "wl_shm") == 0) {
