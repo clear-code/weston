@@ -356,6 +356,8 @@ udev_input_init(struct udev_input *input, struct weston_compositor *c,
 		return -1;
 	}
 
+	udev_seat_get_named(input, "default");
+
 	process_events(input);
 
 	return udev_input_enable(input);

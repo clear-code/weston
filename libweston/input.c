@@ -3445,6 +3445,8 @@ weston_seat_init(struct weston_seat *seat, struct weston_compositor *ec,
 	seat->modifier_state = 0;
 	seat->seat_name = strdup(seat_name);
 
+	weston_seat_init_keyboard(seat, NULL);
+
 	wl_list_insert(ec->seat_list.prev, &seat->link);
 
 	clipboard_create(seat);
