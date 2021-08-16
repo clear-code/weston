@@ -2273,11 +2273,14 @@ input_handle_capabilities(void *data, struct wl_seat *seat,
 	struct wayland_input *input = data;
 
 	if ((caps & WL_SEAT_CAPABILITY_POINTER) && !input->parent.pointer) {
-		input->parent.pointer = wl_seat_get_pointer(seat);
-		wl_pointer_set_user_data(input->parent.pointer, input);
-		wl_pointer_add_listener(input->parent.pointer,
-					&pointer_listener, input);
-		weston_seat_init_pointer(&input->base);
+		const char *disable = getenv("WESTON_DISABLE_POINTER");
+		if (!disable) {
+			input->parent.pointer = wl_seat_get_pointer(seat);
+			wl_pointer_set_user_data(input->parent.pointer, input);
+			wl_pointer_add_listener(input->parent.pointer,
+									&pointer_listener, input);
+			weston_seat_init_pointer(&input->base);
+		}
 	} else if (!(caps & WL_SEAT_CAPABILITY_POINTER) && input->parent.pointer) {
 		if (input->seat_version >= WL_POINTER_RELEASE_SINCE_VERSION)
 			wl_pointer_release(input->parent.pointer);
