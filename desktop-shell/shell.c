@@ -491,6 +491,10 @@ shell_configuration(struct desktop_shell *shell)
 	weston_config_section_get_uint(section, "num-workspaces",
 				       &shell->workspaces.num,
 				       DEFAULT_NUM_WORKSPACES);
+
+	weston_config_section_get_string(section, "keep-above-app-id",
+					 &shell->keep_above_app_id,
+					 NULL);
 }
 
 static int
@@ -1849,6 +1853,24 @@ shell_surface_update_child_surface_layers (struct shell_surface *shsurf)
 	weston_desktop_surface_propagate_layer(shsurf->desktop_surface);
 }
 
+static struct weston_view *
+get_view_for_app_id(struct weston_layer_entry *layer_link, const char *app_id)
+{
+	struct weston_view *view;
+
+	if (!app_id)
+		return NULL;
+
+	wl_list_for_each(view, &layer_link->layer->view_list.link, layer_link.link) {
+		struct shell_surface *s = get_shell_surface(view->surface);
+		const char *id = s ? weston_desktop_surface_get_app_id(s->desktop_surface) : NULL;
+		if (id && !strcmp(app_id, id)) {
+			return view;
+		}
+	}
+	return NULL;
+}
+
 /* Update the surface’s layer. Mark both the old and new views as having dirty
  * geometry to ensure the changes are redrawn.
  *
@@ -1860,6 +1882,7 @@ shell_surface_update_layer(struct shell_surface *shsurf)
 	struct weston_surface *surface =
 		weston_desktop_surface_get_surface(shsurf->desktop_surface);
 	struct weston_layer_entry *new_layer_link;
+	struct weston_view *view;
 
 	new_layer_link = shell_surface_calculate_layer_link(shsurf);
 
@@ -1871,6 +1894,13 @@ shell_surface_update_layer(struct shell_surface *shsurf)
 	weston_view_geometry_dirty(shsurf->view);
 	weston_layer_entry_remove(&shsurf->view->layer_link);
 	weston_layer_entry_insert(new_layer_link, &shsurf->view->layer_link);
+
+	view = get_view_for_app_id(new_layer_link, shsurf->shell->keep_above_app_id);
+	if (view) {
+		weston_layer_entry_remove(&view->layer_link);
+		weston_layer_entry_insert(new_layer_link, &view->layer_link);
+	}
+
 	weston_view_geometry_dirty(shsurf->view);
 	weston_surface_damage(surface);
 
@@ -4949,6 +4979,8 @@ shell_destroy(struct wl_listener *listener, void *data)
 	weston_layer_fini(&shell->lock_layer);
 	weston_layer_fini(&shell->input_panel_layer);
 	weston_layer_fini(&shell->minimized_layer);
+
+	free(shell->keep_above_app_id);
 
 	free(shell->client);
 	free(shell);
