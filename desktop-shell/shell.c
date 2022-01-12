@@ -464,7 +464,7 @@ shell_configuration(struct desktop_shell *shell)
 {
 	struct weston_config_section *section;
 	char *s, *client, *cur;
-	int allow_zap;
+	int allow_zap, keep_above_fullscreen_layer;
 
 	section = weston_config_get_section(wet_get_config(shell->compositor),
 					    "shell", NULL, NULL);
@@ -523,6 +523,11 @@ shell_configuration(struct desktop_shell *shell)
 			*item = cur;
 		}
 	} while (cur && (cur = strstr(cur, ",")));
+
+	weston_config_section_get_bool(section,
+				       "keep-above-fullscreen-layer",
+				       &keep_above_fullscreen_layer, false);
+	shell->keep_above_fullscreen_layer = keep_above_fullscreen_layer;
 }
 
 struct weston_output *
@@ -3838,7 +3843,7 @@ activate(struct desktop_shell *shell, struct weston_view *view,
 
 	/* Only demote fullscreen surfaces on the output of activated shsurf.
 	 * Leave fullscreen surfaces on unrelated outputs alone. */
-	if (shsurf->output)
+	if (shsurf->output && !shell->keep_above_fullscreen_layer)
 		lower_fullscreen_layer(shell, shsurf->output);
 
 	weston_view_activate(view, seat, flags);
