@@ -463,7 +463,7 @@ static void
 shell_configuration(struct desktop_shell *shell)
 {
 	struct weston_config_section *section;
-	char *s, *client;
+	char *s, *client, *cur;
 	int allow_zap;
 
 	section = weston_config_get_section(wet_get_config(shell->compositor),
@@ -505,6 +505,24 @@ shell_configuration(struct desktop_shell *shell)
 	weston_config_section_get_uint(section, "num-workspaces",
 				       &shell->workspaces.num,
 				       DEFAULT_NUM_WORKSPACES);
+
+	weston_config_section_get_string(section, "keep-above-app-ids",
+					 &shell->keep_above_app_ids,
+					 NULL);
+	cur = shell->keep_above_app_ids;
+	do {
+		if (cur && *cur == ',') {
+			*cur = '\0';
+			++cur;
+		}
+		if (cur && *cur == ',')
+			continue;
+		if (cur && *cur) {
+			struct wl_array *ids = &shell->keep_above_app_ids_array;
+			char **item = wl_array_add(ids, sizeof(char*));
+			*item = cur;
+		}
+	} while (cur && (cur = strstr(cur, ",")));
 }
 
 struct weston_output *
@@ -1906,6 +1924,24 @@ shell_surface_update_child_surface_layers (struct shell_surface *shsurf)
 	weston_desktop_surface_propagate_layer(shsurf->desktop_surface);
 }
 
+static struct weston_view *
+get_view_for_app_id(struct weston_layer_entry *layer_link, const char *app_id)
+{
+	struct weston_view *view;
+
+	if (!app_id)
+		return NULL;
+
+	wl_list_for_each(view, &layer_link->layer->view_list.link, layer_link.link) {
+		struct shell_surface *s = get_shell_surface(view->surface);
+		const char *id = s ? weston_desktop_surface_get_app_id(s->desktop_surface) : NULL;
+		if (id && !strcmp(app_id, id)) {
+			return view;
+		}
+	}
+	return NULL;
+}
+
 /* Update the surface’s layer. Mark both the old and new views as having dirty
  * geometry to ensure the changes are redrawn.
  *
@@ -1917,6 +1953,9 @@ shell_surface_update_layer(struct shell_surface *shsurf)
 	struct weston_surface *surface =
 		weston_desktop_surface_get_surface(shsurf->desktop_surface);
 	struct weston_layer_entry *new_layer_link;
+	struct weston_view *view;
+	const char **app_ids = shsurf->shell->keep_above_app_ids_array.data;
+	ssize_t i, n_app_ids = shsurf->shell->keep_above_app_ids_array.size / sizeof(char*);
 
 	new_layer_link = shell_surface_calculate_layer_link(shsurf);
 
@@ -1928,6 +1967,18 @@ shell_surface_update_layer(struct shell_surface *shsurf)
 	weston_view_geometry_dirty(shsurf->view);
 	weston_layer_entry_remove(&shsurf->view->layer_link);
 	weston_layer_entry_insert(new_layer_link, &shsurf->view->layer_link);
+
+	for (i = n_app_ids - 1; i >= 0; i--) {
+		const char *app_id = app_ids[i];
+		if (!app_id || !*app_id)
+			continue;
+		view = get_view_for_app_id(new_layer_link, app_id);
+		if (view) {
+			weston_layer_entry_remove(&view->layer_link);
+			weston_layer_entry_insert(new_layer_link, &view->layer_link);
+		}
+	}
+
 	weston_view_geometry_dirty(shsurf->view);
 	weston_surface_damage(surface);
 
@@ -2161,11 +2212,25 @@ shell_configure_fullscreen(struct shell_surface *shsurf)
 	struct weston_surface *surface =
 		weston_desktop_surface_get_surface(shsurf->desktop_surface);
 	int32_t surf_x, surf_y, surf_width, surf_height;
+	const char **app_ids = shsurf->shell->keep_above_app_ids_array.data;
+	ssize_t i, n_app_ids = shsurf->shell->keep_above_app_ids_array.size / sizeof(char*);
 
 	/* Reverse the effect of lower_fullscreen_layer() */
 	weston_layer_entry_remove(&shsurf->view->layer_link);
 	weston_layer_entry_insert(&shsurf->shell->fullscreen_layer.view_list,
 				  &shsurf->view->layer_link);
+
+	for (i = n_app_ids - 1; i >= 0; i--) {
+		const char *app_id = app_ids[i];
+		struct weston_view *view;
+		if (!app_id || !*app_id)
+			continue;
+		view = get_view_for_app_id(&shsurf->shell->fullscreen_layer.view_list, app_id);
+		if (view) {
+			weston_layer_entry_remove(&view->layer_link);
+			weston_layer_entry_insert(&shsurf->shell->fullscreen_layer.view_list, &view->layer_link);
+		}
+	}
 
 	if (!shsurf->fullscreen_output) {
 		/* If there is no output, there's not much we can do.
@@ -4933,6 +4998,9 @@ shell_destroy(struct wl_listener *listener, void *data)
 		workspace_destroy(*ws);
 	wl_array_release(&shell->workspaces.array);
 
+	wl_array_release(&shell->keep_above_app_ids_array);
+	free(shell->keep_above_app_ids);
+
 	free(shell->client);
 	free(shell);
 }
@@ -5084,6 +5152,7 @@ wet_shell_init(struct weston_compositor *ec,
 
 	wl_array_init(&shell->workspaces.array);
 	wl_list_init(&shell->workspaces.client_list);
+	wl_array_init(&shell->keep_above_app_ids_array);
 
 	if (input_panel_setup(shell) < 0)
 		return -1;

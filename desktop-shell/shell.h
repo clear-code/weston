@@ -208,6 +208,8 @@ struct desktop_shell {
 	enum animation_type win_close_animation_type;
 	enum animation_type startup_animation_type;
 	enum animation_type focus_animation_type;
+	char *keep_above_app_ids;
+	struct wl_array keep_above_app_ids_array;
 
 	struct weston_layer minimized_layer;
 
