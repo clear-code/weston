@@ -38,14 +38,14 @@ static void
 touch_switch_disable(struct wl_client *client,
 		     struct wl_resource *resource)
 {
-	printf("Disable touchscreen!");
+	printf("Disable touchscreen!\n");
 }
 
 static void
 touch_switch_enable(struct wl_client *client,
 		    struct wl_resource *resource)
 {
-	printf("Enable touchscreen!");
+	printf("Enable touchscreen!\n");
 }
 
 static const struct weston_touch_switch_interface

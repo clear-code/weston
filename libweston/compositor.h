@@ -2320,6 +2320,9 @@ int
 weston_compositor_enable_touch_calibrator(struct weston_compositor *compositor,
 				weston_touch_calibration_save_func save);
 
+int
+weston_compositor_enable_touch_switch(struct weston_compositor *compositor);
+
 #ifdef  __cplusplus
 }
 #endif
