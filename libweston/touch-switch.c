@@ -38,14 +38,18 @@ static void
 touch_switch_disable(struct wl_client *client,
 		     struct wl_resource *resource)
 {
+	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
 	printf("Disable touchscreen!\n");
+	weston_input_touchscreen_set_enabled(compositor, false);
 }
 
 static void
 touch_switch_enable(struct wl_client *client,
 		    struct wl_resource *resource)
 {
+	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
 	printf("Enable touchscreen!\n");
+	weston_input_touchscreen_set_enabled(compositor, true);
 }
 
 static const struct weston_touch_switch_interface

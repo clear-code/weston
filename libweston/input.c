@@ -2565,6 +2565,9 @@ notify_touch_normalized(struct weston_touch_device *device,
 	struct weston_seat *seat = device->aggregate->seat;
 	struct weston_touch *touch = device->aggregate;
 
+	if (seat->compositor->touchscreen_disabled)
+		return;
+
 	if (touch_type != WL_TOUCH_UP) {
 		if (weston_touch_device_can_calibrate(device))
 			assert(norm != NULL);
@@ -2616,6 +2619,9 @@ notify_touch_frame(struct weston_touch_device *device)
 {
 	struct weston_touch_grab *grab;
 
+	if (device->aggregate->seat->compositor->touchscreen_disabled)
+		return;
+
 	switch (weston_touch_device_get_mode(device)) {
 	case WESTON_TOUCH_MODE_NORMAL:
 	case WESTON_TOUCH_MODE_PREP_CALIB:
@@ -2635,6 +2641,9 @@ WL_EXPORT void
 notify_touch_cancel(struct weston_touch_device *device)
 {
 	struct weston_touch_grab *grab;
+
+	if (device->aggregate->seat->compositor->touchscreen_disabled)
+		return;
 
 	switch (weston_touch_device_get_mode(device)) {
 	case WESTON_TOUCH_MODE_NORMAL:
@@ -5070,4 +5079,11 @@ weston_input_init(struct weston_compositor *compositor)
 		return -1;
 
 	return 0;
+}
+
+void
+weston_input_touchscreen_set_enabled(struct weston_compositor *compositor,
+				     bool enabled)
+{
+	compositor->touchscreen_disabled = !enabled;
 }
