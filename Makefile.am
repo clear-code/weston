@@ -80,6 +80,7 @@ libweston_@LIBWESTON_MAJOR@_la_SOURCES =			\
 	libweston/data-device.c				\
 	libweston/screenshooter.c			\
 	libweston/touch-calibration.c			\
+	libweston/touch-switch.c			\
 	libweston/clipboard.c				\
 	libweston/zoom.c				\
 	libweston/bindings.c				\
@@ -169,7 +170,9 @@ nodist_libweston_@LIBWESTON_MAJOR@_la_SOURCES =				\
 	protocol/input-timestamps-unstable-v1-protocol.c		\
 	protocol/input-timestamps-unstable-v1-server-protocol.h		\
 	protocol/weston-touch-calibration-protocol.c			\
-	protocol/weston-touch-calibration-server-protocol.h
+	protocol/weston-touch-calibration-server-protocol.h		\
+	protocol/weston-touch-switch-protocol.c			\
+	protocol/weston-touch-switch-server-protocol.h
 
 BUILT_SOURCES += $(nodist_libweston_@LIBWESTON_MAJOR@_la_SOURCES)
 
@@ -1561,6 +1564,8 @@ EXTRA_DIST +=					\
 	protocol/text-cursor-position.xml	\
 	protocol/weston-test.xml		\
 	protocol/weston-touch-calibration.xml	\
+	protocol/weston-touch-switch.xml	\
+	protocol/weston-touch-switch.xml	\
 	protocol/ivi-application.xml		\
 	protocol/ivi-hmi-controller.xml
 

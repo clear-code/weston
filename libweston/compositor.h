@@ -1160,6 +1160,8 @@ struct weston_compositor {
 	weston_touch_calibration_save_func touch_calibration_save;
 	struct weston_layer calibrator_layer;
 	struct weston_touch_calibrator *touch_calibrator;
+
+	struct wl_global *touch_switch;
 };
 
 struct weston_buffer {
