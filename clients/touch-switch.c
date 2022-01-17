@@ -26,13 +26,21 @@
 #include <string.h>
 #include <stdio.h>
 #include <wayland-client.h>
+#include <weston-touch-switch-client-protocol.h>
+
+struct weston_touch_switch *switcher;
 
 static void
 global_handler(void *data, struct wl_registry *registry, uint32_t id,
 	       const char *interface, uint32_t version)
 {
-	if (!strcmp(interface, "weston_touch_switch"))
-		printf("touch switch found!");
+	if (!strcmp(interface, "weston_touch_switch")) {
+		switcher = wl_registry_bind(registry, id,
+					    &weston_touch_switch_interface,
+					    1);
+		weston_touch_switch_disable(switcher);
+		weston_touch_switch_destroy(switcher);
+	}
 }
 
 static void
