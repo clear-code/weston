@@ -28,6 +28,7 @@
 #include <wayland-client.h>
 #include <weston-touch-switch-client-protocol.h>
 
+static const char *command = NULL;
 
 static void
 global_handler(void *data, struct wl_registry *registry, uint32_t id,
@@ -38,7 +39,15 @@ global_handler(void *data, struct wl_registry *registry, uint32_t id,
 		switcher = wl_registry_bind(registry, id,
 					    &weston_touch_switch_interface,
 					    1);
-		weston_touch_switch_disable(switcher);
+		if (command && !strcmp(command, "enable")) {
+			weston_touch_switch_enable(switcher);
+		} else if (command && !strcmp(command, "disable")) {
+			weston_touch_switch_disable(switcher);
+		} else if (command && *command) {
+			fprintf(stderr, "Unknown command: %s\n", command);
+		} else {
+			fprintf(stderr, "Command isn't specified\n");
+		}
 		weston_touch_switch_destroy(switcher);
 	}
 }
@@ -64,6 +73,9 @@ main(int argc, char **argv)
 		fprintf(stderr, "failed to create display\n");
 		return -1;
 	}
+
+	if (argc > 1)
+		command = argv[1];
 
 	registry = wl_display_get_registry(display);
 	wl_registry_add_listener(registry, &registry_listener, NULL);
