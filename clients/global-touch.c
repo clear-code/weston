@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <wayland-client.h>
-#include <weston-touch-switch-client-protocol.h>
+#include <weston-global-touch-client-protocol.h>
 
 static const char *command = NULL;
 
@@ -34,21 +34,21 @@ static void
 global_handler(void *data, struct wl_registry *registry, uint32_t id,
 	       const char *interface, uint32_t version)
 {
-	if (!strcmp(interface, "weston_touch_switch")) {
-		struct weston_touch_switch *switcher;
+	if (!strcmp(interface, "weston_global_touch")) {
+		struct weston_global_touch *switcher;
 		switcher = wl_registry_bind(registry, id,
-					    &weston_touch_switch_interface,
+					    &weston_global_touch_interface,
 					    1);
 		if (command && !strcmp(command, "enable")) {
-			weston_touch_switch_enable(switcher);
+			weston_global_touch_enable(switcher);
 		} else if (command && !strcmp(command, "disable")) {
-			weston_touch_switch_disable(switcher);
+			weston_global_touch_disable(switcher);
 		} else if (command && *command) {
 			fprintf(stderr, "Unknown command: %s\n", command);
 		} else {
 			fprintf(stderr, "Command isn't specified\n");
 		}
-		weston_touch_switch_destroy(switcher);
+		weston_global_touch_destroy(switcher);
 	}
 }
 

@@ -924,7 +924,7 @@ weston_compositor_init_config(struct weston_compositor *ec,
 		weston_compositor_enable_touch_calibrator(ec,
 						save_touch_device_calibration);
 
-	weston_compositor_enable_touch_switch(ec);
+	weston_compositor_enable_global_touch(ec);
 
 	return 0;
 }

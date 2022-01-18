@@ -25,17 +25,17 @@
 
 #include "config.h"
 #include "compositor.h"
-#include "weston-touch-switch-server-protocol.h"
+#include "weston-global-touch-server-protocol.h"
 
 static void
-touch_switch_destroy(struct wl_client *client,
+global_touch_destroy(struct wl_client *client,
 		     struct wl_resource *resource)
 {
 	wl_resource_destroy(resource);
 }
 
 static void
-touch_switch_disable(struct wl_client *client,
+global_touch_disable(struct wl_client *client,
 		     struct wl_resource *resource)
 {
 	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
@@ -44,7 +44,7 @@ touch_switch_disable(struct wl_client *client,
 }
 
 static void
-touch_switch_enable(struct wl_client *client,
+global_touch_enable(struct wl_client *client,
 		    struct wl_resource *resource)
 {
 	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
@@ -52,22 +52,22 @@ touch_switch_enable(struct wl_client *client,
 	weston_input_touchscreen_set_enabled(compositor, true);
 }
 
-static const struct weston_touch_switch_interface
-touch_switch_implementation = {
-	touch_switch_destroy,
-	touch_switch_disable,
-	touch_switch_enable,
+static const struct weston_global_touch_interface
+global_touch_implementation = {
+	global_touch_destroy,
+	global_touch_disable,
+	global_touch_enable,
 };
 
 static void
-bind_touch_switch(struct wl_client *client,
+bind_global_touch(struct wl_client *client,
 		  void *data, uint32_t version, uint32_t id)
 {
 	struct weston_compositor *compositor = data;
 	struct wl_resource *resource;
 
 	resource = wl_resource_create(client,
-				      &weston_touch_switch_interface,
+				      &weston_global_touch_interface,
 				      version, id);
 	if (resource == NULL) {
 		wl_client_post_no_memory(client);
@@ -75,20 +75,20 @@ bind_touch_switch(struct wl_client *client,
 	}
 
 	wl_resource_set_implementation(resource,
-				       &touch_switch_implementation,
+				       &global_touch_implementation,
 				       compositor, NULL);
 }
 
 WL_EXPORT int
-weston_compositor_enable_touch_switch(struct weston_compositor *compositor)
+weston_compositor_enable_global_touch(struct weston_compositor *compositor)
 {
-	if (compositor->touch_switch)
+	if (compositor->global_touch)
 		return -1;
 
-	compositor->touch_switch = wl_global_create(compositor->wl_display,
-						    &weston_touch_switch_interface, 1,
-						    compositor, bind_touch_switch);
-	if (!compositor->touch_switch)
+	compositor->global_touch = wl_global_create(compositor->wl_display,
+						    &weston_global_touch_interface, 1,
+						    compositor, bind_global_touch);
+	if (!compositor->global_touch)
 		return -1;
 
 	return 0;

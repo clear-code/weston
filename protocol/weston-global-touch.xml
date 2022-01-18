@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<protocol name="weston_touch_switch">
+<protocol name="weston_global_touch">
 
   <copyright>
     Copyright 2022 ClearCode Inc.
@@ -24,9 +24,9 @@
     DEALINGS IN THE SOFTWARE.
   </copyright>
 
-  <interface name="weston_touch_switch" version="1">
-    <description summary="weston touchscreen switch interface">
-      This is the global interface to disable/enable touchscreen input device.
+  <interface name="weston_global_touch" version="1">
+    <description summary="weston global touchscreen interface">
+      This is the global interface to disable/enable/monitor touchscreen input device.
     </description>
 
     <request name="destroy" type="destructor">

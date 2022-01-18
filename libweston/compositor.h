@@ -1161,7 +1161,7 @@ struct weston_compositor {
 	struct weston_layer calibrator_layer;
 	struct weston_touch_calibrator *touch_calibrator;
 
-	struct wl_global *touch_switch;
+	struct wl_global *global_touch;
 	bool touchscreen_disabled;
 };
 
@@ -2325,7 +2325,7 @@ weston_compositor_enable_touch_calibrator(struct weston_compositor *compositor,
 				weston_touch_calibration_save_func save);
 
 int
-weston_compositor_enable_touch_switch(struct weston_compositor *compositor);
+weston_compositor_enable_global_touch(struct weston_compositor *compositor);
 
 #ifdef  __cplusplus
 }

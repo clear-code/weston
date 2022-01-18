@@ -80,7 +80,7 @@ libweston_@LIBWESTON_MAJOR@_la_SOURCES =			\
 	libweston/data-device.c				\
 	libweston/screenshooter.c			\
 	libweston/touch-calibration.c			\
-	libweston/touch-switch.c			\
+	libweston/global-touch.c			\
 	libweston/clipboard.c				\
 	libweston/zoom.c				\
 	libweston/bindings.c				\
@@ -171,8 +171,8 @@ nodist_libweston_@LIBWESTON_MAJOR@_la_SOURCES =				\
 	protocol/input-timestamps-unstable-v1-server-protocol.h		\
 	protocol/weston-touch-calibration-protocol.c			\
 	protocol/weston-touch-calibration-server-protocol.h		\
-	protocol/weston-touch-switch-protocol.c			\
-	protocol/weston-touch-switch-server-protocol.h
+	protocol/weston-global-touch-protocol.c			\
+	protocol/weston-global-touch-server-protocol.h
 
 BUILT_SOURCES += $(nodist_libweston_@LIBWESTON_MAJOR@_la_SOURCES)
 
@@ -548,7 +548,7 @@ demo_clients =					\
 	weston-stacking				\
 	weston-calibrator			\
 	weston-touch-calibrator			\
-	weston-touch-switch			\
+	weston-global-touch			\
 	weston-scaler
 
 if INSTALL_DEMO_CLIENTS
@@ -799,13 +799,13 @@ nodist_weston_touch_calibrator_SOURCES =		\
 weston_touch_calibrator_LDADD = libtoytoolkit.la
 weston_touch_calibrator_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS)
 
-weston_touch_switch_SOURCES = 			\
-	clients/touch-switch.c
-nodist_weston_touch_switch_SOURCES =		\
-	protocol/weston-touch-switch-protocol.c	\
-	protocol/weston-touch-switch-client-protocol.h
-weston_touch_switch_LDADD = $(CLIENT_LIBS)
-weston_touch_switch_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS)
+weston_global_touch_SOURCES = 			\
+	clients/global-touch.c
+nodist_weston_global_touch_SOURCES =		\
+	protocol/weston-global-touch-protocol.c	\
+	protocol/weston-global-touch-client-protocol.h
+weston_global_touch_LDADD = $(CLIENT_LIBS)
+weston_global_touch_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS)
 
 if BUILD_SUBSURFACES_CLIENT
 demo_clients += weston-subsurfaces
@@ -896,8 +896,8 @@ BUILT_SOURCES +=					\
 	protocol/weston-screenshooter-client-protocol.h			\
 	protocol/weston-touch-calibration-protocol.c			\
 	protocol/weston-touch-calibration-client-protocol.h		\
-	protocol/weston-touch-switch-protocol.c			\
-	protocol/weston-touch-switch-client-protocol.h		\
+	protocol/weston-global-touch-protocol.c			\
+	protocol/weston-global-touch-client-protocol.h		\
 	protocol/text-cursor-position-client-protocol.h	\
 	protocol/text-cursor-position-protocol.c	\
 	protocol/text-input-unstable-v1-protocol.c			\
@@ -1575,8 +1575,8 @@ EXTRA_DIST +=					\
 	protocol/text-cursor-position.xml	\
 	protocol/weston-test.xml		\
 	protocol/weston-touch-calibration.xml	\
-	protocol/weston-touch-switch.xml	\
-	protocol/weston-touch-switch.xml	\
+	protocol/weston-global-touch.xml	\
+	protocol/weston-global-touch.xml	\
 	protocol/ivi-application.xml		\
 	protocol/ivi-hmi-controller.xml
 
