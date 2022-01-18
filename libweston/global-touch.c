@@ -28,13 +28,6 @@
 #include "weston-global-touch-server-protocol.h"
 
 static void
-global_touch_destroy(struct wl_client *client,
-		     struct wl_resource *resource)
-{
-	wl_resource_destroy(resource);
-}
-
-static void
 global_touch_disable(struct wl_client *client,
 		     struct wl_resource *resource)
 {
@@ -54,7 +47,6 @@ global_touch_enable(struct wl_client *client,
 
 static const struct weston_global_touch_interface
 global_touch_implementation = {
-	global_touch_destroy,
 	global_touch_disable,
 	global_touch_enable,
 };

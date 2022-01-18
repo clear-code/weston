@@ -29,13 +29,6 @@
       This is the global interface to disable/enable/monitor touchscreen input device.
     </description>
 
-    <request name="destroy" type="destructor">
-      <description summary="unbind">
-	Destroy the binding to the global interface, does not affect any
-	objects already created through this interface.
-      </description>
-    </request>
-
     <request name="disable">
       <description summary="Disable all touchscreen">
       </description>
