@@ -6702,6 +6702,8 @@ weston_compositor_destroy(struct weston_compositor *compositor)
 	if (compositor->heads_changed_source)
 		wl_event_source_remove(compositor->heads_changed_source);
 
+	weston_compositor_destroy_global_touch(compositor);
+
 	free(compositor);
 }
 

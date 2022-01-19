@@ -2325,7 +2325,10 @@ weston_compositor_enable_touch_calibrator(struct weston_compositor *compositor,
 				weston_touch_calibration_save_func save);
 
 int
-weston_compositor_enable_global_touch(struct weston_compositor *compositor);
+weston_compositor_create_global_touch(struct weston_compositor *compositor);
+
+int
+weston_compositor_destroy_global_touch(struct weston_compositor *compositor);
 
 #ifdef  __cplusplus
 }

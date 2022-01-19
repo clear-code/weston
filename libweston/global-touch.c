@@ -72,7 +72,7 @@ bind_global_touch(struct wl_client *client,
 }
 
 WL_EXPORT int
-weston_compositor_enable_global_touch(struct weston_compositor *compositor)
+weston_compositor_create_global_touch(struct weston_compositor *compositor)
 {
 	if (compositor->global_touch)
 		return -1;
@@ -82,6 +82,18 @@ weston_compositor_enable_global_touch(struct weston_compositor *compositor)
 						    compositor, bind_global_touch);
 	if (!compositor->global_touch)
 		return -1;
+
+	return 0;
+}
+
+WL_EXPORT int
+weston_compositor_destroy_global_touch(struct weston_compositor *compositor)
+{
+	if (!compositor->global_touch)
+		return -1;
+
+	wl_global_destroy(compositor->global_touch);
+	compositor->global_touch = NULL;
 
 	return 0;
 }
