@@ -2565,6 +2565,7 @@ notify_touch_normalized(struct weston_touch_device *device,
 	struct weston_seat *seat = device->aggregate->seat;
 	struct weston_touch *touch = device->aggregate;
 
+	notify_global_touch(device, time, touch_id, x, y, touch_type);
 	if (seat->compositor->touchscreen_disabled)
 		return;
 
@@ -2619,6 +2620,7 @@ notify_touch_frame(struct weston_touch_device *device)
 {
 	struct weston_touch_grab *grab;
 
+	notify_global_touch_frame(device);
 	if (device->aggregate->seat->compositor->touchscreen_disabled)
 		return;
 
@@ -2642,6 +2644,7 @@ notify_touch_cancel(struct weston_touch_device *device)
 {
 	struct weston_touch_grab *grab;
 
+	notify_global_touch_cancel(device);
 	if (device->aggregate->seat->compositor->touchscreen_disabled)
 		return;
 

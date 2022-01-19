@@ -1669,9 +1669,8 @@ notify_touch_calibrator_cancel(struct weston_touch_device *device);
 
 void
 notify_global_touch(struct weston_touch_device *device,
-		    const struct timespec *time, int32_t slot,
-		    const struct weston_point2d_device_normalized *norm,
-		    int touch_type);
+		    const struct timespec *time, int touch_id,
+		    double x, double y, int touch_type);
 
 void
 notify_global_touch_frame(struct weston_touch_device *device);

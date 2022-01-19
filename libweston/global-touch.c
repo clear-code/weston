@@ -122,20 +122,61 @@ weston_compositor_destroy_global_touch(struct weston_compositor *compositor)
 	return 0;
 }
 
+static inline int64_t
+timespec_to_msec(const struct timespec *a)
+{
+        return (int64_t)a->tv_sec * 1000 + a->tv_nsec / 1000000;
+}
+
 WL_EXPORT void
 notify_global_touch(struct weston_touch_device *device,
-		    const struct timespec *time, int32_t slot,
-		    const struct weston_point2d_device_normalized *norm,
+		    const struct timespec *time, int touch_id,
+		    double double_x, double double_y,
 		    int touch_type)
 {
+	struct weston_compositor *compositor = device->aggregate->seat->compositor;
+	struct wl_list *resource_list = &compositor->global_touch->resource_list;
+	struct wl_resource *resource;
+	uint32_t msecs = timespec_to_msec(time);
+	wl_fixed_t x = wl_fixed_from_double(double_x);
+	wl_fixed_t y = wl_fixed_from_double(double_y);
+
+	switch (touch_type) {
+	case WL_TOUCH_UP:
+		wl_resource_for_each(resource, resource_list)
+			weston_global_touch_send_up(resource, msecs, touch_id);
+		break;
+	case WL_TOUCH_DOWN:
+		wl_resource_for_each(resource, resource_list)
+			weston_global_touch_send_down(resource, msecs,
+						      touch_id, x, y);
+		break;
+	case WL_TOUCH_MOTION:
+		wl_resource_for_each(resource, resource_list)
+			weston_global_touch_send_motion(resource, msecs,
+							touch_id, x, y);
+		break;
+	default:
+		return;
+	}
 }
 
 WL_EXPORT void
 notify_global_touch_frame(struct weston_touch_device *device)
 {
+	struct weston_compositor *compositor = device->aggregate->seat->compositor;
+	struct wl_resource *resource;
+
+	wl_resource_for_each(resource, &compositor->global_touch->resource_list)
+		weston_global_touch_send_frame(resource);
 }
 
 WL_EXPORT void
 notify_global_touch_cancel(struct weston_touch_device *device)
 {
+	struct weston_compositor *compositor = device->aggregate->seat->compositor;
+	struct wl_resource *resource;
+
+	wl_resource_for_each(resource, &compositor->global_touch->resource_list)
+		weston_global_touch_send_cancel(resource);
 }
