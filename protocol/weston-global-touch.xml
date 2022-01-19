@@ -46,13 +46,11 @@
 	assigned a unique ID. Future events from this touch point reference
 	this ID. The ID ceases to be valid after a touch up event and may be
 	reused in the future.
-
-	For the coordinate units, see weston_touch_calibrator.
       </description>
       <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
       <arg name="id" type="int" summary="the unique ID of this touch point"/>
-      <arg name="x" type="uint" summary="x coordinate in calibration units"/>
-      <arg name="y" type="uint" summary="y coordinate in calibration units"/>
+      <arg name="x" type="uint" summary="x coordinate"/>
+      <arg name="y" type="uint" summary="y coordinate"/>
     </event>
 
     <event name="up">
@@ -68,13 +66,11 @@
     <event name="motion">
       <description summary="update of touch point coordinates">
 	A touch point has changed coordinates.
-
-	For the coordinate units, see weston_touch_calibrator.
       </description>
       <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
       <arg name="id" type="int" summary="the unique ID of this touch point"/>
-      <arg name="x" type="uint" summary="x coordinate in calibration units"/>
-      <arg name="y" type="uint" summary="y coordinate in calibration units"/>
+      <arg name="x" type="uint" summary="x coordinate"/>
+      <arg name="y" type="uint" summary="y coordinate"/>
     </event>
 
     <event name="frame">
