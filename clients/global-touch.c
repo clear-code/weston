@@ -43,7 +43,9 @@ touch_down_handler(void *data, struct weston_global_touch *interface,
 	       "    touch_id: %d\n"
 	       "    x: %d\n"
 	       "    y: %d\n",
-	       time, touch_id, x, y);
+	       time, touch_id,
+	       (int) wl_fixed_to_double(x),
+	       (int) wl_fixed_to_double(y));
 }
 
 static void
@@ -65,7 +67,9 @@ touch_motion_handler(void *data, struct weston_global_touch *interface,
 	       "    touch_id: %d\n"
 	       "    x: %d\n"
 	       "    y: %d\n",
-	       time, touch_id, x, y);
+	       time, touch_id,
+	       (int) wl_fixed_to_double(x),
+	       (int) wl_fixed_to_double(y));
 }
 
 static void
