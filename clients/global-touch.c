@@ -30,25 +30,30 @@
 
 static const char *command = NULL;
 
+struct app {
+	struct wl_display *display;
+} app;
+
 static void
 global_handler(void *data, struct wl_registry *registry, uint32_t id,
 	       const char *interface, uint32_t version)
 {
 	if (!strcmp(interface, "weston_global_touch")) {
-		struct weston_global_touch *switcher;
-		switcher = wl_registry_bind(registry, id,
-					    &weston_global_touch_interface,
-					    1);
+		struct weston_global_touch *global_touch
+			= wl_registry_bind(registry, id,
+					   &weston_global_touch_interface, 1);
 		if (command && !strcmp(command, "enable")) {
-			weston_global_touch_enable(switcher);
+			weston_global_touch_enable(global_touch);
+			wl_display_roundtrip(app.display);
 		} else if (command && !strcmp(command, "disable")) {
-			weston_global_touch_disable(switcher);
+			weston_global_touch_disable(global_touch);
+			wl_display_roundtrip(app.display);
 		} else if (command && *command) {
 			fprintf(stderr, "Unknown command: %s\n", command);
 		} else {
 			fprintf(stderr, "Command isn't specified\n");
 		}
-		weston_global_touch_destroy(switcher);
+		weston_global_touch_destroy(global_touch);
 	}
 }
 
@@ -74,13 +79,14 @@ main(int argc, char **argv)
 		return -1;
 	}
 
+	app.display = display;
+
 	if (argc > 1)
 		command = argv[1];
 
 	registry = wl_display_get_registry(display);
-	wl_registry_add_listener(registry, &registry_listener, NULL);
+	wl_registry_add_listener(registry, &registry_listener, &app);
 
-	wl_display_roundtrip(display);
 	wl_display_roundtrip(display);
 
 	wl_registry_destroy(registry);
