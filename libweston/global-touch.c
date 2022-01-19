@@ -27,6 +27,10 @@
 #include "compositor.h"
 #include "weston-global-touch-server-protocol.h"
 
+struct weston_global_touch {
+	struct wl_global *global_touch;
+};
+
 static void
 global_touch_disable(struct wl_client *client,
 		     struct wl_resource *resource)
@@ -77,11 +81,19 @@ weston_compositor_create_global_touch(struct weston_compositor *compositor)
 	if (compositor->global_touch)
 		return -1;
 
-	compositor->global_touch = wl_global_create(compositor->wl_display,
-						    &weston_global_touch_interface, 1,
-						    compositor, bind_global_touch);
+	compositor->global_touch = zalloc(sizeof(struct weston_global_touch));
 	if (!compositor->global_touch)
 		return -1;
+
+	compositor->global_touch->global_touch
+		= wl_global_create(compositor->wl_display,
+				   &weston_global_touch_interface, 1,
+				   compositor, bind_global_touch);
+	if (!compositor->global_touch) {
+		free(compositor->global_touch->global_touch);
+		compositor->global_touch = NULL;
+		return -1;
+	}
 
 	return 0;
 }
@@ -92,7 +104,8 @@ weston_compositor_destroy_global_touch(struct weston_compositor *compositor)
 	if (!compositor->global_touch)
 		return -1;
 
-	wl_global_destroy(compositor->global_touch);
+	wl_global_destroy(compositor->global_touch->global_touch);
+	free(compositor->global_touch);
 	compositor->global_touch = NULL;
 
 	return 0;

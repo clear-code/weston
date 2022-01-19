@@ -1046,6 +1046,8 @@ typedef int (*weston_touch_calibration_save_func)(
 	const struct weston_touch_device_matrix *calibration);
 struct weston_touch_calibrator;
 
+struct weston_global_touch;
+
 struct weston_desktop_xwayland;
 struct weston_desktop_xwayland_interface;
 
@@ -1161,7 +1163,7 @@ struct weston_compositor {
 	struct weston_layer calibrator_layer;
 	struct weston_touch_calibrator *touch_calibrator;
 
-	struct wl_global *global_touch;
+	struct weston_global_touch *global_touch;
 	bool touchscreen_disabled;
 };
 
