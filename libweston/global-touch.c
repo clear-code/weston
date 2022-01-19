@@ -121,3 +121,21 @@ weston_compositor_destroy_global_touch(struct weston_compositor *compositor)
 
 	return 0;
 }
+
+WL_EXPORT void
+notify_global_touch(struct weston_touch_device *device,
+		    const struct timespec *time, int32_t slot,
+		    const struct weston_point2d_device_normalized *norm,
+		    int touch_type)
+{
+}
+
+WL_EXPORT void
+notify_global_touch_frame(struct weston_touch_device *device)
+{
+}
+
+WL_EXPORT void
+notify_global_touch_cancel(struct weston_touch_device *device)
+{
+}

@@ -1668,6 +1668,18 @@ void
 notify_touch_calibrator_cancel(struct weston_touch_device *device);
 
 void
+notify_global_touch(struct weston_touch_device *device,
+		    const struct timespec *time, int32_t slot,
+		    const struct weston_point2d_device_normalized *norm,
+		    int touch_type);
+
+void
+notify_global_touch_frame(struct weston_touch_device *device);
+
+void
+notify_global_touch_cancel(struct weston_touch_device *device);
+
+void
 weston_layer_entry_insert(struct weston_layer_entry *list,
 			  struct weston_layer_entry *entry);
 void
