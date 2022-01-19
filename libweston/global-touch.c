@@ -30,6 +30,7 @@
 struct weston_global_touch {
 	struct wl_global *global_touch;
 	struct wl_list resource_list;
+	bool touch_is_disabled;
 };
 
 static void
@@ -38,7 +39,7 @@ global_touch_disable(struct wl_client *client,
 {
 	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
 	weston_log("Disable touchscreen\n");
-	weston_input_touchscreen_set_enabled(compositor, false);
+	weston_global_touch_set_enabled(compositor->global_touch, false);
 }
 
 static void
@@ -47,7 +48,7 @@ global_touch_enable(struct wl_client *client,
 {
 	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
 	weston_log("Enable touchscreen\n");
-	weston_input_touchscreen_set_enabled(compositor, true);
+	weston_global_touch_set_enabled(compositor->global_touch, true);
 }
 
 static const struct weston_global_touch_interface
@@ -120,6 +121,19 @@ weston_compositor_destroy_global_touch(struct weston_compositor *compositor)
 	compositor->global_touch = NULL;
 
 	return 0;
+}
+
+void
+weston_global_touch_set_enabled(struct weston_global_touch *global_touch,
+				bool enabled)
+{
+	global_touch->touch_is_disabled = !enabled;
+}
+
+bool
+weston_global_touch_get_enabled(struct weston_global_touch *global_touch)
+{
+	return !global_touch->touch_is_disabled;
 }
 
 static inline int64_t

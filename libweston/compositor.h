@@ -1164,7 +1164,6 @@ struct weston_compositor {
 	struct weston_touch_calibrator *touch_calibrator;
 
 	struct weston_global_touch *global_touch;
-	bool touchscreen_disabled;
 };
 
 struct weston_buffer {
@@ -2149,9 +2148,6 @@ noop_renderer_init(struct weston_compositor *ec);
 
 int
 weston_input_init(struct weston_compositor *compositor);
-void
-weston_input_touchscreen_set_enabled(struct weston_compositor *compositor,
-				     bool enabled);
 
 int
 weston_backend_init(struct weston_compositor *c,
@@ -2342,6 +2338,13 @@ weston_compositor_create_global_touch(struct weston_compositor *compositor);
 
 int
 weston_compositor_destroy_global_touch(struct weston_compositor *compositor);
+
+void
+weston_global_touch_set_enabled(struct weston_global_touch *global_touch,
+				bool enabled);
+
+bool
+weston_global_touch_get_enabled(struct weston_global_touch *global_touch);
 
 #ifdef  __cplusplus
 }
