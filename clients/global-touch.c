@@ -38,33 +38,46 @@ static void
 touch_down_handler(void *data, struct weston_global_touch *interface,
 		   uint32_t time, int32_t touch_id, uint32_t x, uint32_t y)
 {
-	printf("down_handler\n");
+	printf("touch_down_handler\n"
+	       "    time: %d\n"
+	       "    touch_id: %d\n"
+	       "    x: %d\n"
+	       "    y: %d\n",
+	       time, touch_id, x, y);
 }
 
 static void
 touch_up_handler(void *data, struct weston_global_touch *interface,
 		 uint32_t time, int32_t touch_id)
 {
-	printf("up_handler\n");
+	printf("touch_up_handler\n"
+	       "    time: %d\n"
+	       "    touch_id: %d\n",
+	       time, touch_id);
 }
 
 static void
 touch_motion_handler(void *data, struct weston_global_touch *interface,
 	       uint32_t time, int32_t touch_id, uint32_t x, uint32_t y)
 {
-	printf("motion_handler\n");
+	printf("touch_motion_handler\n"
+	       "    time: %d\n"
+	       "    touch_id: %d\n"
+	       "    x: %d\n"
+	       "    y: %d\n",
+	       time, touch_id, x, y);
 }
 
 static void
 touch_frame_handler(void *data, struct weston_global_touch *interface)
 {
-	printf("frame_handler\n");
+	printf("touch_frame_handler\n");
 }
 
 static void
 touch_cancel_handler(void *data, struct weston_global_touch *interface)
 {
-	printf("cancel_handler\n");
+	printf("touch_cancel_handler\n");
 }
 
 struct weston_global_touch_listener touch_listener = {
