@@ -35,6 +35,55 @@ struct app {
 } app;
 
 static void
+down_handler(void *data, struct weston_global_touch *interface,
+	     uint32_t time, int32_t touch_id, uint32_t x, uint32_t y)
+{
+	printf("down_handler\n");
+}
+
+static void
+up_handler(void *data, struct weston_global_touch *interface,
+	   uint32_t time, int32_t touch_id)
+{
+	printf("up_handler\n");
+}
+
+static void
+motion_handler(void *data, struct weston_global_touch *interface,
+	       uint32_t time, int32_t touch_id, uint32_t x, uint32_t y)
+{
+	printf("motion_handler\n");
+}
+
+static void
+frame_handler(void *data, struct weston_global_touch *interface)
+{
+	printf("frame_handler\n");
+}
+
+static void
+cancel_handler(void *data, struct weston_global_touch *interface)
+{
+	printf("cancel_handler\n");
+}
+
+struct weston_global_touch_listener touch_listener = {
+	down_handler,
+	up_handler,
+	motion_handler,
+	frame_handler,
+	cancel_handler
+};
+
+static void
+run_monitor(struct weston_global_touch *global_touch)
+{
+	weston_global_touch_add_listener(global_touch,
+					 &touch_listener, &app);
+	while (wl_display_dispatch(app.display) != -1);
+}
+
+static void
 global_handler(void *data, struct wl_registry *registry, uint32_t id,
 	       const char *interface, uint32_t version)
 {
@@ -48,6 +97,8 @@ global_handler(void *data, struct wl_registry *registry, uint32_t id,
 		} else if (command && !strcmp(command, "disable")) {
 			weston_global_touch_disable(global_touch);
 			wl_display_roundtrip(app.display);
+		} else if (command && !strcmp(command, "monitor")) {
+			run_monitor(global_touch);
 		} else if (command && *command) {
 			fprintf(stderr, "Unknown command: %s\n", command);
 		} else {
