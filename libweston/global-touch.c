@@ -29,6 +29,7 @@
 
 struct weston_global_touch {
 	struct wl_global *global_touch;
+	struct wl_list resource_list;
 };
 
 static void
@@ -56,6 +57,12 @@ global_touch_implementation = {
 };
 
 static void
+destroy_resource(struct wl_resource *resource)
+{
+	wl_list_remove(wl_resource_get_link(resource));
+}
+
+static void
 bind_global_touch(struct wl_client *client,
 		  void *data, uint32_t version, uint32_t id)
 {
@@ -72,7 +79,9 @@ bind_global_touch(struct wl_client *client,
 
 	wl_resource_set_implementation(resource,
 				       &global_touch_implementation,
-				       compositor, NULL);
+				       compositor, destroy_resource);
+	wl_list_insert(&compositor->global_touch->resource_list,
+		       wl_resource_get_link(resource));
 }
 
 WL_EXPORT int
@@ -94,6 +103,8 @@ weston_compositor_create_global_touch(struct weston_compositor *compositor)
 		compositor->global_touch = NULL;
 		return -1;
 	}
+
+	wl_list_init(&compositor->global_touch->resource_list);
 
 	return 0;
 }
