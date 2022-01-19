@@ -37,7 +37,7 @@ global_touch_disable(struct wl_client *client,
 		     struct wl_resource *resource)
 {
 	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
-	printf("Disable touchscreen!\n");
+	weston_log("Disable touchscreen\n");
 	weston_input_touchscreen_set_enabled(compositor, false);
 }
 
@@ -46,7 +46,7 @@ global_touch_enable(struct wl_client *client,
 		    struct wl_resource *resource)
 {
 	struct weston_compositor *compositor = wl_resource_get_user_data(resource);
-	printf("Enable touchscreen!\n");
+	weston_log("Enable touchscreen\n");
 	weston_input_touchscreen_set_enabled(compositor, true);
 }
 
