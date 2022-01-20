@@ -1046,6 +1046,8 @@ typedef int (*weston_touch_calibration_save_func)(
 	const struct weston_touch_device_matrix *calibration);
 struct weston_touch_calibrator;
 
+struct weston_global_touch;
+
 struct weston_desktop_xwayland;
 struct weston_desktop_xwayland_interface;
 
@@ -1160,6 +1162,8 @@ struct weston_compositor {
 	weston_touch_calibration_save_func touch_calibration_save;
 	struct weston_layer calibrator_layer;
 	struct weston_touch_calibrator *touch_calibrator;
+
+	struct weston_global_touch *global_touch;
 };
 
 struct weston_buffer {
@@ -1661,6 +1665,17 @@ notify_touch_calibrator_frame(struct weston_touch_device *device);
 
 void
 notify_touch_calibrator_cancel(struct weston_touch_device *device);
+
+void
+notify_global_touch(struct weston_touch_device *device,
+		    const struct timespec *time, int touch_id,
+		    double x, double y, int touch_type);
+
+void
+notify_global_touch_frame(struct weston_touch_device *device);
+
+void
+notify_global_touch_cancel(struct weston_touch_device *device);
 
 void
 weston_layer_entry_insert(struct weston_layer_entry *list,
@@ -2317,6 +2332,19 @@ weston_output_get_first_head(struct weston_output *output);
 int
 weston_compositor_enable_touch_calibrator(struct weston_compositor *compositor,
 				weston_touch_calibration_save_func save);
+
+int
+weston_compositor_create_global_touch(struct weston_compositor *compositor);
+
+int
+weston_compositor_destroy_global_touch(struct weston_compositor *compositor);
+
+void
+weston_global_touch_set_enabled(struct weston_global_touch *global_touch,
+				bool enabled);
+
+bool
+weston_global_touch_get_enabled(struct weston_global_touch *global_touch);
 
 #ifdef  __cplusplus
 }
