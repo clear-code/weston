@@ -33,6 +33,7 @@ struct app {
 	struct wl_display *display;
 	struct weston_global_touch *global_touch;
 	const char *command;
+	int status;
 };
 
 static void
@@ -121,8 +122,10 @@ global_handler(void *data, struct wl_registry *registry, uint32_t id,
 			run_monitor(app);
 		} else if (app->command && *app->command) {
 			fprintf(stderr, "Unknown command: %s\n", app->command);
+			app->status = -1;
 		} else {
 			fprintf(stderr, "Command isn't specified\n");
+			app->status = -1;
 		}
 	}
 }
@@ -153,6 +156,7 @@ main(int argc, char **argv)
 	app.display = display;
 	app.global_touch = NULL;
 	app.command = argc > 1 ? argv[1] : NULL;
+	app.status = 0;
 
 	registry = wl_display_get_registry(display);
 	wl_registry_add_listener(registry, &registry_listener, &app);
@@ -164,9 +168,10 @@ main(int argc, char **argv)
 	} else {
 		fprintf(stderr,
 			"weston-global-touch protocol isn't supported!\n");
+		app.status = -1;
 	}
 	wl_registry_destroy(registry);
 	wl_display_disconnect(display);
 
-	return 0;
+	return app.status;
 }
