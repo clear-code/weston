@@ -28,10 +28,11 @@
 #include <wayland-client.h>
 #include <weston-global-touch-client-protocol.h>
 
-static const char *command = NULL;
 
-struct app {
+static struct app {
 	struct wl_display *display;
+	struct weston_global_touch *global_touch;
+	const char *command;
 } app;
 
 static void
@@ -105,23 +106,22 @@ global_handler(void *data, struct wl_registry *registry, uint32_t id,
 	       const char *interface, uint32_t version)
 {
 	if (!strcmp(interface, "weston_global_touch")) {
-		struct weston_global_touch *global_touch
+		app.global_touch
 			= wl_registry_bind(registry, id,
 					   &weston_global_touch_interface, 1);
-		if (command && !strcmp(command, "enable")) {
-			weston_global_touch_enable(global_touch);
+		if (app.command && !strcmp(app.command, "enable")) {
+			weston_global_touch_enable(app.global_touch);
 			wl_display_roundtrip(app.display);
-		} else if (command && !strcmp(command, "disable")) {
-			weston_global_touch_disable(global_touch);
+		} else if (app.command && !strcmp(app.command, "disable")) {
+			weston_global_touch_disable(app.global_touch);
 			wl_display_roundtrip(app.display);
-		} else if (command && !strcmp(command, "monitor")) {
-			run_monitor(global_touch);
-		} else if (command && *command) {
-			fprintf(stderr, "Unknown command: %s\n", command);
+		} else if (app.command && !strcmp(app.command, "monitor")) {
+			run_monitor(app.global_touch);
+		} else if (app.command && *app.command) {
+			fprintf(stderr, "Unknown command: %s\n", app.command);
 		} else {
 			fprintf(stderr, "Command isn't specified\n");
 		}
-		weston_global_touch_destroy(global_touch);
 	}
 }
 
@@ -148,15 +148,23 @@ main(int argc, char **argv)
 	}
 
 	app.display = display;
+	app.global_touch = NULL;
 
 	if (argc > 1)
-		command = argv[1];
+		app.command = argc > 1 ? argv[1] : NULL;
 
 	registry = wl_display_get_registry(display);
 	wl_registry_add_listener(registry, &registry_listener, &app);
 
 	wl_display_roundtrip(display);
 
+	if (app.global_touch) {
+		weston_global_touch_destroy(app.global_touch);
+	} else {
+		fprintf(stderr,
+			"weston-global-touch protocol isn't supported!\n",
+			app.command);
+	}
 	wl_registry_destroy(registry);
 	wl_display_disconnect(display);
 
