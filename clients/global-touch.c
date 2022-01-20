@@ -29,11 +29,11 @@
 #include <weston-global-touch-client-protocol.h>
 
 
-static struct app {
+struct app {
 	struct wl_display *display;
 	struct weston_global_touch *global_touch;
 	const char *command;
-} app;
+};
 
 static void
 touch_down_handler(void *data, struct weston_global_touch *interface,
@@ -94,31 +94,33 @@ struct weston_global_touch_listener touch_listener = {
 };
 
 static void
-run_monitor(struct weston_global_touch *global_touch)
+run_monitor(struct app *app)
 {
-	weston_global_touch_add_listener(global_touch,
-					 &touch_listener, &app);
-	while (wl_display_dispatch(app.display) != -1);
+	weston_global_touch_add_listener(app->global_touch,
+					 &touch_listener, app);
+	while (wl_display_dispatch(app->display) != -1);
 }
 
 static void
 global_handler(void *data, struct wl_registry *registry, uint32_t id,
 	       const char *interface, uint32_t version)
 {
+	struct app *app = data;
+
 	if (!strcmp(interface, "weston_global_touch")) {
-		app.global_touch
+		app->global_touch
 			= wl_registry_bind(registry, id,
 					   &weston_global_touch_interface, 1);
-		if (app.command && !strcmp(app.command, "enable")) {
-			weston_global_touch_enable(app.global_touch);
-			wl_display_roundtrip(app.display);
-		} else if (app.command && !strcmp(app.command, "disable")) {
-			weston_global_touch_disable(app.global_touch);
-			wl_display_roundtrip(app.display);
-		} else if (app.command && !strcmp(app.command, "monitor")) {
-			run_monitor(app.global_touch);
-		} else if (app.command && *app.command) {
-			fprintf(stderr, "Unknown command: %s\n", app.command);
+		if (app->command && !strcmp(app->command, "enable")) {
+			weston_global_touch_enable(app->global_touch);
+			wl_display_roundtrip(app->display);
+		} else if (app->command && !strcmp(app->command, "disable")) {
+			weston_global_touch_disable(app->global_touch);
+			wl_display_roundtrip(app->display);
+		} else if (app->command && !strcmp(app->command, "monitor")) {
+			run_monitor(app);
+		} else if (app->command && *app->command) {
+			fprintf(stderr, "Unknown command: %s\n", app->command);
 		} else {
 			fprintf(stderr, "Command isn't specified\n");
 		}
@@ -138,6 +140,7 @@ static const struct wl_registry_listener registry_listener = {
 int
 main(int argc, char **argv)
 {
+	struct app app;
 	struct wl_display *display;
 	struct wl_registry *registry;
 
