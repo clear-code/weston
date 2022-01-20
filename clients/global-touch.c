@@ -149,9 +149,7 @@ main(int argc, char **argv)
 
 	app.display = display;
 	app.global_touch = NULL;
-
-	if (argc > 1)
-		app.command = argc > 1 ? argv[1] : NULL;
+	app.command = argc > 1 ? argv[1] : NULL;
 
 	registry = wl_display_get_registry(display);
 	wl_registry_add_listener(registry, &registry_listener, &app);
@@ -162,8 +160,7 @@ main(int argc, char **argv)
 		weston_global_touch_destroy(app.global_touch);
 	} else {
 		fprintf(stderr,
-			"weston-global-touch protocol isn't supported!\n",
-			app.command);
+			"weston-global-touch protocol isn't supported!\n");
 	}
 	wl_registry_destroy(registry);
 	wl_display_disconnect(display);
